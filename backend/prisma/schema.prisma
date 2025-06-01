@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+ SYSTEM_ADMINISTRATOR 
+ NORMAL_USER
+ STORE_OWNER
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(60)
+  email     String    @unique
+  password  String
+  address   String?   @db.VarChar(400)
+  role      Role      @default(NORMAL_USER)
+  ratings   Rating[]
+  stores    Store[]   @relation("StoreOwner")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Store {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(60)
+  email     String
+  address   String?   @db.VarChar(400)
+  ownerId   Int
+  owner     User      @relation("StoreOwner", fields: [ownerId], references: [id])
+  ratings   Rating[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Rating {
+  id        Int       @id @default(autoincrement())
+  rating    Int       @db.SmallInt
+  userId    Int
+  storeId   Int
+  user      User      @relation(fields: [userId], references: [id])
+  store     Store     @relation(fields: [storeId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, storeId]) // Prevent duplicate ratings from same user for same store
+}
