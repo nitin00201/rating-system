@@ -6,8 +6,8 @@
 #### 🛠 1. Clone the Backend Repository
 
 ```bash
-git clone <repo-uri>
-cd <backend-folder>
+git clone https://github.com/nitin00201/rating-system.git
+cd backend
 ```
 
 ---
